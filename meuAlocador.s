@@ -1,10 +1,10 @@
 .section .data
-A: .int 0
-B: .int 0
 .section .text
-.globl _start
-_start:
+.globl meuAlocaMem
+.globl meuLiberaMem
+.globl imprMapa
 
+.type meuAlocaMem, @function
 meuAlocaMem:
 	pushl %ebp
 	movl %esp, %ebp
@@ -14,21 +14,20 @@ meuAlocaMem:
 	popl %ebp
 	ret
 
+.type meuLiberaMem, @function
 meuLiberaMem:
 	pushl %ebp
-	movl %exp, %ebp
+	movl %esp, %ebp
 	movl 8(%ebp), %eax
 	movl (%eax), %ebx
 	#######Algorimo#######
 	popl %ebp
 	ret
 
+.type imprMapa, @function
 imprMapa:
 	pushl %ebp
-	movl %exp, %ebp
+	movl %esp, %ebp
 	###Algorimo###
 	popl %ebp
 	ret
-
-
-_start:

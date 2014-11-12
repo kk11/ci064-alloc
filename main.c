@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+// #include "meuAlocador.s"
 
 #define MAX_ELEM 16
 #define TAM_MAX  64
@@ -8,8 +9,8 @@
 
 
 // ---------
-// #define malloc meuAlocaMem
-// #define free   meuLiberaMem
+#define malloc meuAlocaMem
+#define free   meuLiberaMem
 // ---------
 
 
@@ -51,7 +52,7 @@ int main ( int argc, char** argv ) {
     }    
 
   // ---------
-  // imprMapa ();
+  imprMapa ();
   // ---------
 
   for (i=0; i<MAX_ELEM; i++)
@@ -59,7 +60,7 @@ int main ( int argc, char** argv ) {
       free (vetor[i]);
 
   // ---------
-  // imprMapa ();
+  imprMapa ();
   // ---------
 
 
