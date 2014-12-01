@@ -1,8 +1,22 @@
 .section .data
 
+head:
+  .string "---------\n"
+inicio:
+  .string "Início heap: %#010x\n"
+segmento:
+  .string "Segmento %d: %03d bytes "
+ocupados:
+  .string "ocupados\n"
+livres:
+  .string "livres\n"
+segocc:
+  .string "Segmentos Ocupados: %d / %d bytes"
+segfree:
+  .string "Segmentos Livres: %d / %d bytes"
+
 heap_start:
   .long 0
-
 current_break:
   .long 0
 
@@ -57,29 +71,29 @@ alloc_begin:
   jle alloc
 
 next_mem:
-  addl 8, %eax
+  addl $8, %eax
   addl %edx, %eax #Próxima seção de memória
 
   jmp alloc_begin
 
 alloc:
   movl $UNAVAILABLE, 0(%eax) #Seta essa seção como ocupada
-  movl %ecx, 4(%eax) #Seta o tamanho da seção
-  addl 8, %eax
+  //movl %ecx, 4(%eax) #Seta o tamanho da seção
+  addl $8, %eax
 
-  movl %ebx, current_break
+  //movl %ebx, current_break
 
   movl %ebp, %esp
   popl %ebp
   ret
 
 more_mem:
-  addl 8, %ebx
+  addl $8, %ebx
   addl %ecx, %ebx #Adiciona o tanto de memória a mais que se precisa no break
 
   pushl %eax
-  pushl %ebx
-  pushl %ecx #salva os registradores para a chamada de função
+  pushl %ecx
+  pushl %ebx 
 
   movl $BREAK, %eax
   int $SYSCALL #Reseta o break
@@ -87,11 +101,19 @@ more_mem:
   cmpl $0, %eax
   je error #erro
 
-  popl %ecx
   popl %ebx
+  popl %ecx
   popl %eax
 
-  jmp alloc
+  movl $UNAVAILABLE, 0(%eax)
+  movl %ecx, 4(%eax)
+  addl $8, %eax
+
+  movl %ebx, current_break
+
+  movl %ebp, %esp
+  popl %ebp
+  ret
 
 error:
   movl $0, %eax #Em erro, retorna 0
@@ -111,10 +133,37 @@ meuLiberaMem:
   ret
 
 .type imprMapa, @function
+seg_ocupados:
+  .int 0
+byt_ocupados:
+  .int 0
+seg_livres:
+  .int 0
+byt_livres:
+  .int 0
 imprMapa:
   pushl %ebp
   movl %esp, %ebp
-  ###Algoritmo###
+
+  pushl $head
+  call printf
+
+  movl heap_start, %eax #eax para procura
+  movl current_break, %ebx
+
+begin_print:
+  cmpl %eax, %ebx
+  je end_print
+
+  cmpl $UNAVAILABLE, 0(%eax) #isAvailable?
+  je occ
+
+  incl $seg_livres
+  movl 4(%eax), %ecx
+  addl %ecx, $byt_livres
+
+  pushl 
+
   movl %ebp, %esp
   popl %ebp
   ret

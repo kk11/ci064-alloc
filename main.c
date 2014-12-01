@@ -48,21 +48,21 @@ int main ( int argc, char** argv ) {
       else
         {
           printf("Liberando vetor[%d]\n", j );
-          free ( vetor[j] );
+          //free ( vetor[j] );
           vetor[j] = NULL;
         }
     }    
 
   // ---------
-  // imprMapa ();
+   imprMapa ();
   // ---------
 
   for (i=0; i<MAX_ELEM; i++)
     if (vetor[i] != NULL)
-      free (vetor[i]);
+      //free (vetor[i]);
 
   // ---------
-  // imprMapa ();
+   imprMapa ();
   // ---------
 
 
