@@ -42,7 +42,7 @@ meuAlocaMem:
 
   movl 8(%ebp), %ebx #ecx agora tem o tamanho a ser alocado
   movl $1, %eax
-  int $SYCALL
+  int $SYSCALL
 
 #   movl heap_start, %eax #eax agora tem a localização atual da pesquisa
 #   movl current_break, %ebx
