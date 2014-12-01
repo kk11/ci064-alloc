@@ -9,7 +9,7 @@
 
 
 // ---------
-#define malloc meuAlocaMem
+// #define malloc meuAlocaMem
 // #define free   meuLiberaMem
 // ---------
 
