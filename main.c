@@ -19,6 +19,8 @@ int main ( int argc, char** argv ) {
   void *vetor[MAX_ELEM+1];
   int i, j, tam;
 
+  initAloc();
+
   // faz cada elemento do vetor apontar para NULL
   for (i=0; i<MAX_ELEM; i++)
     vetor[i] = NULL;
