@@ -10,7 +10,7 @@
 
 // ---------
 #define malloc meuAlocaMem
-#define free   meuLiberaMem
+// #define free   meuLiberaMem
 // ---------
 
 
@@ -52,7 +52,7 @@ int main ( int argc, char** argv ) {
     }    
 
   // ---------
-  imprMapa ();
+  // imprMapa ();
   // ---------
 
   for (i=0; i<MAX_ELEM; i++)
@@ -60,7 +60,7 @@ int main ( int argc, char** argv ) {
       free (vetor[i]);
 
   // ---------
-  imprMapa ();
+  // imprMapa ();
   // ---------
 
 
