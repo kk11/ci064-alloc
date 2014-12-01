@@ -20,7 +20,7 @@ meuLiberaMem:
 	movl %esp, %ebp
 	movl 8(%ebp), %eax
 	movl (%eax), %ebx
-	#######Algorimo#######
+	#######Algoritmo#######
 	popl %ebp
 	ret
 
@@ -28,6 +28,6 @@ meuLiberaMem:
 imprMapa:
 	pushl %ebp
 	movl %esp, %ebp
-	###Algorimo###
+	###Algoritmo###
 	popl %ebp
 	ret
