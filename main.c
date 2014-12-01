@@ -30,7 +30,7 @@ int main ( int argc, char** argv ) {
   // inicia a metade superior do conjunto de elementos
   for ( i=0; i<MAX_ELEM/2; i++ ) {
     tam = rand () % TAM_MAX;  // tam = [0..TAM_MAX]
-    vetor[i] = (void) malloc (tam+1); 
+    vetor[i] = malloc (tam+1); 
   }
 
   // Serão tentadas NUM_OPER operações de alocacao/liberacao 
@@ -41,7 +41,7 @@ int main ( int argc, char** argv ) {
         { 
           tam = rand () % TAM_MAX;  // tam = [0..TAM_MAX]
           printf("Alocando %d bytes em vetor[%d]\n", tam, j );
-          vetor[j] = (void) malloc (tam+1);
+          vetor[j] = malloc (tam+1);
         } 
       else
         {
