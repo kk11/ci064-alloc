@@ -22,9 +22,11 @@ initAloc:
   pushl %ebp
   movl %esp, %ebp
 
-  movl $BREAK, %eax  #Get Break
-  movl 0, %ebx
-  int $SYSCALL
+  # movl $BREAK, %eax  #Get Break
+  # movl 0, %ebx
+  # int $SYSCALL
+
+  movl _end, %eax
 
   incl %eax
   mov %eax, current_break #Salva o break atual
