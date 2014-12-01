@@ -17,7 +17,7 @@ current_break:
 .globl meuLiberaMem
 .globl imprMapa
 
-.type initAloc, @funtion
+.type initAloc, @function
 initAloc:
   pushl %ebp
   movl %esp, %ebp
@@ -82,7 +82,7 @@ more_mem:
   pushl %ecx #salva os registradores para a chamada de função
 
   movl $BREAK, %eax
-  int SYSCALL #Reseta o break
+  int $SYSCALL #Reseta o break
 
   cmpl $0, %eax
   je error #erro
