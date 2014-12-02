@@ -1,7 +1,7 @@
 .section .data
 
 seg:
-  .int 1
+  .int 0
 seg_ocupados:
   .int 0
 byt_ocupados:
@@ -10,6 +10,8 @@ seg_livres:
   .int 0
 byt_livres:
   .int 0
+inte:
+  .string "%#08x / %#08x\n"
 head:
   .string "---------\n"
 inicio:
@@ -29,6 +31,10 @@ heap_start:
   .long 0
 current_break:
   .long 0
+search_var:
+  .long 0
+size_var:
+  .int 0
 
 .equ UNAVAILABLE, 0
 .equ AVAILABLE, 1
@@ -88,7 +94,7 @@ next_mem:
 
 alloc:
   movl $UNAVAILABLE, 0(%eax) #Seta essa seção como ocupada
-  movl %ecx, 4(%eax) #Seta o tamanho da seção
+  #movl %ecx, 4(%eax) #Seta o tamanho da seção
   addl $8, %eax
 
   movl %ebx, current_break
@@ -147,64 +153,90 @@ imprMapa:
   pushl %ebp
   movl %esp, %ebp
 
+  movl $0, seg
+  movl $0, seg_ocupados
+  movl $0, byt_ocupados
+  movl $0, seg_livres
+  movl $0, byt_livres #Reseta os valores
+
   pushl $head
   call printf #---------
+  addl $4, %esp #limpa a pilha
 
-  movl heap_start, %eax #eax para procura
-  movl current_break, %ebx
-
+  movl heap_start, %eax
+  movl %eax, search_var
+  
 begin_print:
+  movl search_var, %eax
+  movl heap_start, %ebx
   cmpl %eax, %ebx #Chegou ao fim
-  je end_print
+  jle end_print
+
+  incl seg
+  movl 4(%eax), %ebx
+  movl %ebx, size_var 
 
   cmpl $UNAVAILABLE, 0(%eax) #isAvailable?
   je occp
 
-  incl $seg_livres
-  movl 4(%eax), %ecx #ecx = tamanho da seção
-  addl %ecx, $byt_livres
+  incl seg_livres
+  movl size_var, %eax
+  addl %eax, byt_livres
 
-  pushl %ecx
-  pushl $seg
+  pushl size_var
+  pushl seg
+  pushl $segmento
   call printf #Segmento X: xxx bytes
+  addl $12, %esp
 
   pushl $livres
   call printf #livres
+  addl $4, %esp
 
-  incl $seg
-  addl $8, %eax
-  addl %ecx, %eax
+  addl $8, search_var
+  movl size_var, %eax
+  addl %eax, search_var
 
   jmp begin_print
 
 occp:
-  incl $seg_ocupados
-  movl 4(%eax), %ecx #ecx = tamanho da seção
-  addl %ecx, $byt_ocupados
+  incl seg_ocupados
+  movl size_var, %eax
+  addl %eax, byt_ocupados
 
-  pushl %ecx
-  pushl $seg
+  pushl size_var
+  pushl seg
+  pushl $segmento
   call printf #Segmento X: xxx bytes
+  addl $12, %esp
 
   pushl $ocupados
   call printf #ocupados
+  addl $4, %esp
 
-  incl $seg
-  addl $8, %eax
-  addl %ecx, %eax
+  pushl search_var
+  pushl size_var
+  pushl $inte
+  call printf
+  addl $12, %esp
+  addl $8, search_var
+  movl size_var, %eax
+  addl %eax, search_var
 
-  jmp begin_print
+  #jmp begin_print 
 
 end_print:
-  pushl $byt_ocupados
-  pushl $seg_ocupados
+  pushl byt_ocupados
+  pushl seg_ocupados
   pushl $segocc
   call printf #Segmentos Ocupados: X / xxx bytes
+  addl $12, %esp
 
-  pushl $byt_livres
-  pushl $seg_livres
+  pushl byt_livres
+  pushl seg_livres
   pushl $segfree
   call printf #Segmentos Livres: X / xxx bytes
+  addl $12, %esp
 
   movl %ebp, %esp
   popl %ebp
