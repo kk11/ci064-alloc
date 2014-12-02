@@ -13,9 +13,7 @@ byt_livres:
 inte:
   .string "%#08x / %#08x\n"
 head:
-  .string "---------\n"
-inicio:
-  .string "Início heap: %#010x\n"
+  .string "---------\nInício heap: %#010x\n"
 segmento:
   .string "Segmento %d: %03d bytes "
 ocupados:
@@ -84,7 +82,11 @@ alloc_begin:
   je next_mem
 
   cmpl %edx, %ecx #if ecx <= edx, aloca aqui
-  jle alloc
+  jle alloc_equal
+
+  addl $8, %ecx
+  cmpl %edx, %ecx
+  jl alloc_lesser
 
 next_mem:
   addl $8, %eax
@@ -92,12 +94,26 @@ next_mem:
 
   jmp alloc_begin
 
-alloc:
+alloc_equal:
   movl $UNAVAILABLE, 0(%eax) #Seta essa seção como ocupada
-  #movl %ecx, 4(%eax) #Seta o tamanho da seção
+  movl %edx, 4(%eax)
   addl $8, %eax
 
-  movl %ebx, current_break
+  movl %ebp, %esp
+  popl %ebp
+  ret
+
+alloc_lesser:
+  subl $8, %ecx
+  movl $UNAVAILABLE, 0(%eax)
+  movl %ecx, 4(%eax) #Seta o tamanho da seção ocupada
+  addl $8, %eax
+
+  subl %ecx, %edx
+  subl $8, %edx
+  addl %eax, %ecx
+  movl $AVAILABLE, 0(%ecx)
+  movl %edx, 4(%ecx)
 
   movl %ebp, %esp
   popl %ebp
@@ -141,9 +157,27 @@ error:
 meuLiberaMem:
   pushl %ebp
   movl %esp, %ebp
+
   movl 8(%ebp), %eax
-  movl (%eax), %ebx
-  #######Algoritmo#######
+  subl $8, %eax #Aponta para o início real da seção de memória
+
+  movl $AVAILABLE, 0(%eax)
+
+  movl %eax, %ebx
+  addl $8, %ebx
+  addl 4(%eax), %ebx #Próxima seção de memória
+
+  cmpl %ebx, current_break
+  je fim
+
+  cmpl $UNAVAILABLE, 0(%ebx) #isAvailable
+  je fim
+
+  movl 4(%ebx), %ecx
+  addl $8, %ecx #ecx = tamanho da seção
+  addl %ecx, 4(%eax) #junta as duas seções livres
+
+fim:
   movl %ebp, %esp
   popl %ebp
   ret
@@ -159,18 +193,19 @@ imprMapa:
   movl $0, seg_livres
   movl $0, byt_livres #Reseta os valores
 
+  pushl current_break
   pushl $head
   call printf #---------
-  addl $4, %esp #limpa a pilha
+  addl $8, %esp #limpa a pilha
 
   movl heap_start, %eax
   movl %eax, search_var
   
 begin_print:
   movl search_var, %eax
-  movl heap_start, %ebx
+  movl current_break, %ebx
   cmpl %eax, %ebx #Chegou ao fim
-  jle end_print
+  je end_print
 
   incl seg
   movl 4(%eax), %ebx
@@ -214,16 +249,11 @@ occp:
   call printf #ocupados
   addl $4, %esp
 
-  pushl search_var
-  pushl size_var
-  pushl $inte
-  call printf
-  addl $12, %esp
   addl $8, search_var
   movl size_var, %eax
   addl %eax, search_var
 
-  #jmp begin_print 
+  jmp begin_print 
 
 end_print:
   pushl byt_ocupados
