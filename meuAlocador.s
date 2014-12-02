@@ -1,5 +1,15 @@
 .section .data
 
+seg:
+  .int 1
+seg_ocupados:
+  .int 0
+byt_ocupados:
+  .int 0
+seg_livres:
+  .int 0
+byt_livres:
+  .int 0
 head:
   .string "---------\n"
 inicio:
@@ -11,9 +21,9 @@ ocupados:
 livres:
   .string "livres\n"
 segocc:
-  .string "Segmentos Ocupados: %d / %d bytes"
+  .string "Segmentos Ocupados: %d / %d bytes\n"
 segfree:
-  .string "Segmentos Livres: %d / %d bytes"
+  .string "Segmentos Livres: %d / %d bytes\n"
 
 heap_start:
   .long 0
@@ -78,10 +88,10 @@ next_mem:
 
 alloc:
   movl $UNAVAILABLE, 0(%eax) #Seta essa seção como ocupada
-  //movl %ecx, 4(%eax) #Seta o tamanho da seção
+  movl %ecx, 4(%eax) #Seta o tamanho da seção
   addl $8, %eax
 
-  //movl %ebx, current_break
+  movl %ebx, current_break
 
   movl %ebp, %esp
   popl %ebp
@@ -133,36 +143,68 @@ meuLiberaMem:
   ret
 
 .type imprMapa, @function
-seg_ocupados:
-  .int 0
-byt_ocupados:
-  .int 0
-seg_livres:
-  .int 0
-byt_livres:
-  .int 0
 imprMapa:
   pushl %ebp
   movl %esp, %ebp
 
   pushl $head
-  call printf
+  call printf #---------
 
   movl heap_start, %eax #eax para procura
   movl current_break, %ebx
 
 begin_print:
-  cmpl %eax, %ebx
+  cmpl %eax, %ebx #Chegou ao fim
   je end_print
 
   cmpl $UNAVAILABLE, 0(%eax) #isAvailable?
-  je occ
+  je occp
 
   incl $seg_livres
-  movl 4(%eax), %ecx
+  movl 4(%eax), %ecx #ecx = tamanho da seção
   addl %ecx, $byt_livres
 
-  pushl 
+  pushl %ecx
+  pushl $seg
+  call printf #Segmento X: xxx bytes
+
+  pushl $livres
+  call printf #livres
+
+  incl $seg
+  addl $8, %eax
+  addl %ecx, %eax
+
+  jmp begin_print
+
+occp:
+  incl $seg_ocupados
+  movl 4(%eax), %ecx #ecx = tamanho da seção
+  addl %ecx, $byt_ocupados
+
+  pushl %ecx
+  pushl $seg
+  call printf #Segmento X: xxx bytes
+
+  pushl $ocupados
+  call printf #ocupados
+
+  incl $seg
+  addl $8, %eax
+  addl %ecx, %eax
+
+  jmp begin_print
+
+end_print:
+  pushl $byt_ocupados
+  pushl $seg_ocupados
+  pushl $segocc
+  call printf #Segmentos Ocupados: X / xxx bytes
+
+  pushl $byt_livres
+  pushl $seg_livres
+  pushl $segfree
+  call printf #Segmentos Livres: X / xxx bytes
 
   movl %ebp, %esp
   popl %ebp
